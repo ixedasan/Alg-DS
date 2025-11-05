@@ -26,8 +26,14 @@ class QueueArray {
 		}
 
 		const item = this.items[this.head]
-		delete this.items[this.head]
+		this.items[this.head] = undefined
 		this.head++
+
+		if (this.head > 100 && this.head >= this.size()) {
+			this.items = this.items.slice(this.head)
+			this.tail = this.tail - this.head
+			this.head = 0
+		}
 
 		if (this.isEmpty()) {
 			this.head = 0
@@ -59,7 +65,9 @@ class QueueArray {
 			result.push(this.items[i])
 		}
 		console.log(result.join(' <- '))
-		console.log(`Head: ${this.head}, Tail: ${this.tail}`)
+		console.log(
+			`Head: ${this.head}, Tail: ${this.tail}, Довжина масиву: ${this.items.length}`
+		)
 	}
 
 	clear() {
@@ -101,3 +109,4 @@ for (let i = 0; i < 5000; i++) {
 	queue.dequeue()
 }
 console.timeEnd('Queue - 10000 операцій')
+queue.print()
