@@ -1,21 +1,37 @@
-class QueueArray {
+class Node {
+	constructor(value) {
+		this.value = value
+		this.next = null
+	}
+}
+
+class QueueLinkedList {
 	constructor() {
-		this.items = []
-		this.head = 0
-		this.tail = 0
+		this.head = null
+		this.tail = null
+		this.length = 0
 	}
 
 	size() {
-		return this.tail - this.head
+		return this.length
 	}
 
 	isEmpty() {
-		return this.size() === 0
+		return this.length === 0
 	}
 
 	enqueue(element) {
-		this.items[this.tail] = element
-		this.tail++
+		const newNode = new Node(element)
+
+		if (this.isEmpty()) {
+			this.head = newNode
+			this.tail = newNode
+		} else {
+			this.tail.next = newNode
+			this.tail = newNode
+		}
+
+		this.length++
 		console.log(`Додано елемент: ${element}`)
 	}
 
@@ -25,24 +41,17 @@ class QueueArray {
 			return undefined
 		}
 
-		const item = this.items[this.head]
-		this.items[this.head] = undefined
-		this.head++
+		const removedValue = this.head.value
+		this.head = this.head.next
 
-		if (this.head > 100 && this.head >= this.size()) {
-			this.items = this.items.slice(this.head)
-			this.tail = this.tail - this.head
-			this.head = 0
+		if (this.head === null) {
+			this.tail = null
 		}
 
-		if (this.isEmpty()) {
-			this.head = 0
-			this.tail = 0
-			this.items = []
-		}
+		this.length--
+		console.log(`Видалено елемент: ${removedValue}`)
 
-		console.log(`Видалено елемент: ${item}`)
-		return item
+		return removedValue
 	}
 
 	peek() {
@@ -50,7 +59,7 @@ class QueueArray {
 			console.log('Черга порожня!')
 			return undefined
 		}
-		return this.items[this.head]
+		return this.head.value
 	}
 
 	print() {
@@ -61,24 +70,26 @@ class QueueArray {
 
 		console.log('Елементи черги (від початку до кінця):')
 		let result = []
-		for (let i = this.head; i < this.tail; i++) {
-			result.push(this.items[i])
+		let current = this.head
+
+		while (current !== null) {
+			result.push(current.value)
+			current = current.next
 		}
+
 		console.log(result.join(' <- '))
-		console.log(
-			`Head: ${this.head}, Tail: ${this.tail}, Довжина масиву: ${this.items.length}`
-		)
+		console.log(`Розмір: ${this.length}`)
 	}
 
 	clear() {
-		this.items = []
-		this.head = 0
-		this.tail = 0
+		this.head = null
+		this.tail = null
+		this.length = 0
 		console.log('Черга очищена!')
 	}
 }
 
-const queue = new QueueArray()
+const queue = new QueueLinkedList()
 
 console.log('Черга порожня?', queue.isEmpty())
 
@@ -90,23 +101,24 @@ queue.enqueue(40)
 queue.print()
 console.log('Розмір черги:', queue.size())
 
-console.log('Перший елемент:', queue.peek())
+console.log('\nПерший елемент:', queue.peek())
 
 queue.dequeue()
 queue.dequeue()
 
 queue.print()
-console.log('Розмір черги:', queue.size())
 
 queue.enqueue(50)
 queue.print()
 
-console.time('Queue - 10000 операцій')
+const perfQueue = new QueueLinkedList()
+
+console.time('Linked List - 10000 операцій')
 for (let i = 0; i < 10000; i++) {
-	queue.enqueue(i)
+	perfQueue.enqueue(i)
 }
 for (let i = 0; i < 5000; i++) {
-	queue.dequeue()
+	perfQueue.dequeue()
 }
-console.timeEnd('Queue - 10000 операцій')
-queue.print()
+console.timeEnd('Linked List - 10000 операцій')
+console.log(`Фінальний розмір: ${perfQueue.size()}`)
